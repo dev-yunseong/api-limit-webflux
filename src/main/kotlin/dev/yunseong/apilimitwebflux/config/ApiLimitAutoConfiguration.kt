@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import dev.yunseong.apilimitwebflux.storage.InMemoryRateLimitStorage
 import dev.yunseong.apilimitwebflux.filter.ApiLimitFilter
 import dev.yunseong.apilimitwebflux.storage.RateLimitStorage
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -18,11 +19,14 @@ class ApiLimitAutoConfiguration(
     private val properties: ApiLimitProperties
 ) {
 
+    companion object {
+        private val log = LoggerFactory.getLogger(ApiLimitAutoConfiguration::class.java)
     }
 
     @Bean
     @ConditionalOnMissingBean
     fun rateLimitStorage(): InMemoryRateLimitStorage {
+        log.debug("Creating InMemoryRateLimitStorage bean")
         return InMemoryRateLimitStorage()
     }
 
