@@ -56,3 +56,5 @@ kotlin {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+apply from: 'gradle/publish.gradle'
