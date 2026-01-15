@@ -18,9 +18,6 @@ class ApiLimitAutoConfiguration(
     private val properties: ApiLimitProperties
 ) {
 
-    @Bean
-    fun limitRules(): List<LimitRule<Any>> {
-        return properties.rules.map { it.toDomain() }
     }
 
     @Bean
@@ -32,6 +29,15 @@ class ApiLimitAutoConfiguration(
     @Bean
     @ConditionalOnMissingBean
     fun apiLimitFilter(ruleProvider: ObjectProvider<LimitRule<Any>>, storage: RateLimitStorage<Any>): ApiLimitFilter {
-        return ApiLimitFilter(ruleProvider, storage)
+        log.debug("Creating ApiLimitFilter bean")
+        val yamlRules = properties.rules.map { it.toDomain() }
+
+        val customRules = ruleProvider.orderedStream().toList()
+
+        val allRules = yamlRules + customRules
+
+        log.info("Total {} rules loaded (YAML: {}, Custom: {})",
+            allRules.size, yamlRules.size, customRules.size)
+        return ApiLimitFilter(allRules, storage)
     }
 }

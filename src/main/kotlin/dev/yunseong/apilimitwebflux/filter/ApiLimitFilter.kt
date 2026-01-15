@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 
 @Component
-class ApiLimitFilter(val ruleProvider: ObjectProvider<LimitRule<Any>>, val rateLimitStorage: RateLimitStorage<Any>) : WebFilter {
+class ApiLimitFilter(val rules: List<LimitRule<Any>>, val rateLimitStorage: RateLimitStorage<Any>) : WebFilter {
 
     private val pathParser = PathPatternParser()
 
@@ -25,7 +25,8 @@ class ApiLimitFilter(val ruleProvider: ObjectProvider<LimitRule<Any>>, val rateL
     ): Mono<Void> {
         val requestPath = exchange.request.path.pathWithinApplication()
 
-        val matchedRules = ruleProvider.orderedStream().filter { rule ->
+        val matchedRules = rules.stream().filter { rule ->
+            log.debug("Matching rule path: {}", rule.path)
             val pattern = pathParser.parse(rule.path)
             pattern.matches(requestPath)
         }.toList()
