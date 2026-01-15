@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean
 import dev.yunseong.apilimitwebflux.storage.InMemoryRateLimitStorage
 import dev.yunseong.apilimitwebflux.filter.ApiLimitFilter
 import dev.yunseong.apilimitwebflux.storage.RateLimitStorage
-import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -19,9 +18,9 @@ class ApiLimitAutoConfiguration(
     private val properties: ApiLimitProperties
 ) {
 
-    @PostConstruct
-    fun parseProperties() {
-        properties.rules.forEach { rule ->  rule.toDomain()}
+    @Bean
+    fun limitRules(): List<LimitRule<Any>> {
+        return properties.rules.map { it.toDomain() }
     }
 
     @Bean
