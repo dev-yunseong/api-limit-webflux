@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.util.concurrent.atomic.AtomicInteger
 
-
-import kotlin.time.Duration
+import java.time.Duration
 
 @Component
 class InMemoryRateLimitStorage : RateLimitStorage<Any> {
@@ -39,7 +38,7 @@ class InMemoryRateLimitStorage : RateLimitStorage<Any> {
     private class ApiCount(duration: Duration) {
 
         var count: AtomicInteger = AtomicInteger(0)
-        var ttl: Long = System.currentTimeMillis() + duration.inWholeMilliseconds
+        var ttl: Long = System.currentTimeMillis() + duration.toMillis()
 
         fun getAndIncrement(): Int {
             return count.getAndIncrement()

@@ -3,7 +3,7 @@ package dev.yunseong.apilimitwebflux.config
 import dev.yunseong.apilimitwebflux.domain.IPFactor
 import dev.yunseong.apilimitwebflux.domain.LimitRule
 import org.springframework.boot.context.properties.ConfigurationProperties
-import kotlin.time.Duration
+import java.time.Duration
 
 @ConfigurationProperties("api-limit")
 data class ApiLimitProperties(

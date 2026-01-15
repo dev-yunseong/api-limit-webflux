@@ -1,7 +1,7 @@
 package dev.yunseong.apilimitwebflux.storage
 
 import reactor.core.publisher.Mono
-import kotlin.time.Duration
+import java.time.Duration
 
 interface RateLimitStorage<T> {
 

@@ -1,6 +1,6 @@
 package dev.yunseong.apilimitwebflux.domain
 
-import kotlin.time.Duration
+import java.time.Duration
 
 class LimitRule<out T>(
     val path: String,
