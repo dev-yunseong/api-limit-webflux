@@ -1,6 +1,9 @@
 package dev.yunseong.apilimitwebflux.config
 
+import dev.yunseong.apilimitwebflux.domain.ClientIpResolver
+import dev.yunseong.apilimitwebflux.domain.HeaderClientIpResolver
 import dev.yunseong.apilimitwebflux.domain.LimitRule
+import dev.yunseong.apilimitwebflux.domain.RemoteAddressClientIpResolver
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.context.annotation.Bean
@@ -30,11 +33,37 @@ class ApiLimitAutoConfiguration(
         return InMemoryRateLimitStorage()
     }
 
+    /**
+     * Backs off entirely when the application defines its own, which is the
+     * supported way to derive the visitor address from something this library
+     * does not model.
+     */
     @Bean
     @ConditionalOnMissingBean
-    fun apiLimitFilter(ruleProvider: ObjectProvider<LimitRule<Any>>, storage: RateLimitStorage<Any>): ApiLimitFilter {
+    fun clientIpResolver(): ClientIpResolver {
+        val header = properties.clientIpHeader
+        if (header.isNullOrBlank()) {
+            log.info("Rate limiting by IP counts against the socket address")
+            return RemoteAddressClientIpResolver()
+        }
+        log.info(
+            "Rate limiting by IP counts against the '{}' header, falling back to the socket " +
+                "address when it is absent or not an IP literal. Only safe while the origin " +
+                "refuses requests that bypass the proxy.",
+            header
+        )
+        return HeaderClientIpResolver(header)
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    fun apiLimitFilter(
+        ruleProvider: ObjectProvider<LimitRule<Any>>,
+        storage: RateLimitStorage<Any>,
+        clientIpResolver: ClientIpResolver
+    ): ApiLimitFilter {
         log.debug("Creating ApiLimitFilter bean")
-        val yamlRules = properties.rules.map { it.toDomain() }
+        val yamlRules = properties.rules.map { it.toDomain(clientIpResolver) }
 
         val customRules = ruleProvider.orderedStream().toList()
 

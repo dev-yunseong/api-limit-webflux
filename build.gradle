@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'dev.yunseong'
-version = '0.0.1'
+version = '0.1.0'
 description = 'api-limit-webflux'
 
 java {
@@ -44,6 +44,11 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test'
+    // compileOnly for consumers, but the filter and the auto-configuration need
+    // these at runtime, so the tests that exercise them need them too.
+    testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-reactor'
+    testImplementation 'org.jetbrains.kotlin:kotlin-reflect'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
